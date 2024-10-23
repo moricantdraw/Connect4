@@ -1,4 +1,5 @@
-# https://en.wikipedia.org/wiki/Minimax#Pseudocode
+# https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
+# fail-hard implementation
 import math
 
 EMPTY_VALUE = 0
@@ -6,7 +7,7 @@ EMPTY_VALUE = 0
 TREE = [5,6,4,69,3,70,71,72,6,42,6,420,7,101,102,103]
 RESULT = dict()
 
-def simple_minimax(current_state, depth, maximizing_player):
+def simple_minimax(current_state, depth, maximizing_player, alpha, beta):
     if depth == 0: #or EMPTY_VALUE not in current_state:
         value = state_value(current_state)
         ret_val = (value,0)
@@ -19,10 +20,13 @@ def simple_minimax(current_state, depth, maximizing_player):
         for col in range(7):
             next_state = get_next_state(current_state, col)
             if next_state is not None:
-                temp = simple_minimax(next_state, depth-1, False)
+                temp = simple_minimax(next_state, depth-1, False, alpha, beta)
                 if temp[0]>value:
                     value = temp[0]
                     column = col
+                if value>beta:
+                    break
+                alpha = max(alpha, value)
         ret_val = (value, column)
         # print(f"{depth},{ret_val}")
         RESULT[depth] = RESULT.get(depth,[])+[ret_val]
@@ -33,10 +37,13 @@ def simple_minimax(current_state, depth, maximizing_player):
         for col in range(7):
             next_state = get_next_state(current_state, col)
             if next_state is not None:
-                temp = simple_minimax(next_state, depth-1, True)
+                temp = simple_minimax(next_state, depth-1, True, alpha, beta)
                 if temp[0]<value:
                     value = temp[0]
                     column = col
+                if value<alpha:
+                    break
+                beta = min(beta, value)
         ret_val = (value, column)
         # print(f"{depth},{ret_val}")
         RESULT[depth] = RESULT.get(depth,[])+[ret_val]
@@ -57,6 +64,6 @@ def print_tree(tree):
         # v = (key*"\t").join([str(t) for t in tree[key]])
         print(f"Depth {key}, {tree[key]}")
 
-final = simple_minimax(0, 4, True)
+final = simple_minimax(0, 4, True, -math.inf, math.inf)
 # print(final)
 print_tree(RESULT)
