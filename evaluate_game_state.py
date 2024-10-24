@@ -17,7 +17,7 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         opponent = 2
 
     # Defines  scoring weights for sequences of length 2, 3, and 4 (normalized to 1)
-    weights = {2: 0.1, 3: 0.3, 4: math.inf}
+    weights = {1: 0.0, 2: 0.1, 3: 0.3, 4: math.inf}
 
     # Helper function to check sequences
     def count_sequence(start, delta_row, delta_col, p):
@@ -37,6 +37,7 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
             col += delta_col
 
         # Add to score based on length of sequence
+        token_count = min(max(1, token_count), 4)
         if token_count in weights:
             return weights[token_count]
         return 0

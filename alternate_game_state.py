@@ -39,14 +39,14 @@ def print_game_1d(
 # TESTING STUFF
 # game_state = [
 #     0,
-#     0,
+#     1,
 #     0,
 #     0,
 #     0,
 #     0,
 #     0,  # Row 0 (top)
 #     0,
-#     0,
+#     1,
 #     0,
 #     0,
 #     0,
@@ -82,9 +82,9 @@ def print_game_1d(
 #     0,  # Row 5 (bottom)
 # ]
 
-# Simulate Player 2 making a move in column 3
-# new_game_state = alternative_gamestate(game_state, 3, 2)
+# # Simulate Player 2 making a move in column 3
+# new_game_state = alternative_gamestate(game_state, 2, 2)
 
-# Print the new board as a 2D grid
+# # Print the new board as a 2D grid
 # print("New board after Player 2's move:")
 # print_game_1d(new_game_state)
