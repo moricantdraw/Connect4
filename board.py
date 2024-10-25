@@ -219,16 +219,28 @@ while not game_over:
                 for i in range(6):
                     print(modified_board[7 * i : 7 * i + 7])
                 d = None
-                final = alpha_beta_minimax(modified_board, 1, True, -math.inf, math.inf)
-                if not math.isinf(final[0]):
-                    d = depth
-                    final = (None, None)
-                    while final[1] is None and d > 0:
-                        final = alpha_beta_minimax(
+                # Computer wins
+                computer_wins = alpha_beta_minimax(
+                    modified_board, 1, True, -math.inf, math.inf
+                )
+                # Computer must block
+                computer_block = alpha_beta_minimax(
+                    modified_board, 1, False, -math.inf, math.inf
+                )
+                if math.isinf(computer_wins[0]):
+                    final = computer_wins
+                elif math.isinf(computer_block[0]):
+                    final = computer_block
+                else:
+                    d = min(depth, modified_board.count(0))
+                    chosen_move = (None, None)
+                    while chosen_move[1] is None and d > 0:
+                        chosen_move = alpha_beta_minimax(
                             modified_board, d, True, -math.inf, math.inf
                         )
                         print(d)
                         d -= 2
+                    final = chosen_move
                 print(f"{final}")
                 col = final[1]
                 if col is None:
