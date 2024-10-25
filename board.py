@@ -125,7 +125,7 @@ def draw_board(board):
                     ),
                     RADIUS,
                 )
-    # pygame.display.update()
+    pygame.display.update()
 
 
 def progress_bar():
@@ -205,7 +205,7 @@ while not game_over:
                         game_over = True
 
             # print_board(board)
-            # draw_board(board)
+            draw_board(board)
             turn += 1
             turn = turn % 2
 
@@ -213,29 +213,32 @@ while not game_over:
             # else:
             #     # posx = event.pos[0]
             #     # col = int(math.floor(posx / SQUARESIZE))
-            reset_progress()
-            modified_board = np.reshape(np.fliplr(np.flip(board)), -1).tolist()
-            for i in range(6):
-                print(modified_board[7 * i : 7 * i + 6])
-            final = alpha_beta_minimax(modified_board, depth, True, -math.inf, math.inf)
-            print(final)
-            col = final[1]
-            if col is None:
-                label = myfont.render("Player 1 resigned!!", 1, GREEN)
-                screen.blit(label, (40, 10))
-                game_over = True
-
-            if is_valid_location(board, col):
-                row = get_next_open_row(board, col)
-                drop_piece(board, row, col, 2)
-
-                if winning_move(board, 2):
-                    label = myfont.render("Player 2 wins!!", 1, YELLOW)
+            if not game_over:
+                reset_progress()
+                modified_board = np.reshape(np.fliplr(np.flip(board)), -1).tolist()
+                for i in range(6):
+                    print(modified_board[7 * i : 7 * i + 6])
+                final = alpha_beta_minimax(
+                    modified_board, depth, True, -math.inf, math.inf
+                )
+                print(final)
+                col = final[1]
+                if col is None:
+                    label = myfont.render("Resigned!!", 1, GREEN)
                     screen.blit(label, (40, 10))
                     game_over = True
+                else:
+                    if is_valid_location(board, col):
+                        row = get_next_open_row(board, col)
+                        drop_piece(board, row, col, 2)
 
-            # print_board(board)
-            # draw_board(board)
+                        if winning_move(board, 2):
+                            label = myfont.render("Player 2 wins!!", 1, YELLOW)
+                            screen.blit(label, (40, 10))
+                            game_over = True
+
+                # print_board(board)
+                draw_board(board)
 
             turn += 1
             turn = turn % 2
