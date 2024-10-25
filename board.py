@@ -217,11 +217,19 @@ while not game_over:
                 reset_progress()
                 modified_board = np.reshape(np.fliplr(np.flip(board)), -1).tolist()
                 for i in range(6):
-                    print(modified_board[7 * i : 7 * i + 6])
-                final = alpha_beta_minimax(
-                    modified_board, depth, True, -math.inf, math.inf
-                )
-                print(final)
+                    print(modified_board[7 * i : 7 * i + 7])
+                d = None
+                final = alpha_beta_minimax(modified_board, 1, True, -math.inf, math.inf)
+                if not math.isinf(final[0]):
+                    d = depth
+                    final = (None, None)
+                    while final[1] is None and d > 0:
+                        final = alpha_beta_minimax(
+                            modified_board, d, True, -math.inf, math.inf
+                        )
+                        print(d)
+                        d -= 2
+                print(f"{final}")
                 col = final[1]
                 if col is None:
                     label = myfont.render("Resigned!!", 1, GREEN)
@@ -246,4 +254,4 @@ while not game_over:
             pygame.event.clear()
 
             if game_over:
-                pygame.time.wait(3000)
+                pygame.time.wait(10000)

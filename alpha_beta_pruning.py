@@ -1,6 +1,7 @@
 # https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
 # fail-hard implementation
 import math
+import random
 from evaluate_game_state import evaluate_game_state
 from alternate_game_state import alternative_gamestate  # , game_state
 
@@ -27,7 +28,9 @@ def alpha_beta_minimax(current_state, depth, maximizing_player, alpha, beta):
             next_state = get_next_state(current_state, col, maximizing_player)
             if next_state is not None:
                 temp = alpha_beta_minimax(next_state, depth - 1, False, alpha, beta)
-                if temp[0] > value:
+                if (
+                    temp[0] > value
+                ):  # or (abs(temp[0] - value) < 0.01 and round(random.random())):
                     value = temp[0]
                     column = col
                 if value > beta:
@@ -44,7 +47,9 @@ def alpha_beta_minimax(current_state, depth, maximizing_player, alpha, beta):
             next_state = get_next_state(current_state, col, maximizing_player)
             if next_state is not None:
                 temp = alpha_beta_minimax(next_state, depth - 1, True, alpha, beta)
-                if temp[0] < value:
+                if (
+                    temp[0] < value
+                ):  # or (abs(temp[0] - value) < 0.01 and round(random.random())):
                     value = temp[0]
                     column = col
                 if value < alpha:
@@ -93,14 +98,30 @@ def print_tree(tree):
 # fmt: off
 test_state = [
     0,0,0,0,0,0,0,
-    0,0,2,1,0,0,0,
-    0,0,1,2,1,0,0,
-    0,0,1,2,1,1,0,
-    0,1,1,2,2,2,0,
-    0,1,2,1,2,2,2,
+    0,0,0,2,0,0,0,
+    0,0,1,2,0,0,0,
+    0,0,1,2,0,0,0,
+    0,2,1,1,1,0,0,
+    1,2,2,2,1,0,0,
 ]
+# test_state = [
+#     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,
+#     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,
+#     0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0,
+#     0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0,
+#     2.0, 2.0, 1.0, 1.0, 0.0, 0.0, 0,
+#     1.0, 2.0, 2.0, 2.0, 1.0, 0.0, 0,
+# ]
+# test_state = [
+#     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,
+#     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0,
+#     0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0,
+#     2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0,
+#     2.0, 2.0, 1.0, 1.0, 0.0, 0.0, 0,
+#     1.0, 2.0, 2.0, 2.0, 1.0, 0.0, 0,
+# ]
 # fmt: on
 
-# final = alpha_beta_minimax(test_state, 4, True, -math.inf, math.inf)
+# final = alpha_beta_minimax(test_state, 1, True, -math.inf, math.inf)
 # print(final)
 # print_tree(RESULT)

@@ -17,7 +17,7 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         opponent = 2
 
     # Defines  scoring weights for sequences of length 2, 3, and 4 (normalized to 1)
-    weights = {1: 0.0, 2: 0.1, 3: 0.3, 4: math.inf}
+    weights = {1: 0.0, 2: 1, 3: 5, 4: math.inf}
 
     # Helper function to check sequences
     def count_sequence(start, delta_row, delta_col, p):
@@ -26,10 +26,16 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         token_count = 0
 
         # Traverse the sequence in the specified direction
+        blank = False
         while 0 <= row < rows and 0 <= col < cols:
             index = row * cols + col
             if board[index] == p:
                 token_count += 1
+                if blank:
+                    token_count -= 1
+                    blank = False
+            elif board[index] == 0:
+                blank = True
             else:
                 break  # Stop if different token or empty spot
 
@@ -43,26 +49,40 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         return 0
 
     # Traverse the entire game to evaluate
+    opponent_score = 0
+    player_score = 0
     for row in range(rows):
         for col in range(cols):
             index = row * cols + col
-            if board[index] == player:
+            if board[index] == opponent:
+                opponent_score -= count_sequence(index, 0, 1, opponent)  # Horizontal
+                opponent_score -= count_sequence(index, 1, 0, opponent)  # Vertical
+                opponent_score -= count_sequence(
+                    index, 1, 1, opponent
+                )  # Diagonal-down-right
+                opponent_score -= count_sequence(
+                    index, -1, 1, opponent
+                )  # Diagonal-up-right
+            elif board[index] == player:
                 # Check in all four directions (horizontal, vertical, diagonal-down-right, diagonal-up-right)
-                score += count_sequence(index, 0, 1, player)  # Horizontal
-                score += count_sequence(index, 1, 0, player)  # Vertical
-                score += count_sequence(index, 1, 1, player)  # Diagonal-down-right
-                score += count_sequence(index, -1, 1, player)  # Diagonal-up-right
-            elif board[index] == opponent:
-                score -= count_sequence(index, 0, 1, opponent)  # Horizontal
-                score -= count_sequence(index, 1, 0, opponent)  # Vertical
-                score -= count_sequence(index, 1, 1, opponent)  # Diagonal-down-right
-                score -= count_sequence(index, -1, 1, opponent)  # Diagonal-up-right
+                player_score += count_sequence(index, 0, 1, player)  # Horizontal
+                player_score += count_sequence(index, 1, 0, player)  # Vertical
+                player_score += count_sequence(
+                    index, 1, 1, player
+                )  # Diagonal-down-right
+                player_score += count_sequence(
+                    index, -1, 1, player
+                )  # Diagonal-up-right
 
     # max_possible_score = 4 * rows * cols
 
     # Normalize the score between 0 and 1
     # normalized_score = min(score / max_possible_score, 1.0)
-
+    if math.isinf(opponent_score):
+        # if math.isinf(player_score):
+        #     return 0
+        return opponent_score
+    score = player_score + opponent_score
     return score  # normalized_score
 
 
