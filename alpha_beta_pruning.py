@@ -77,50 +77,17 @@ def print_tree(tree):
         print(f"Depth {key}, {tree[key]}")
 
 
+# fmt: off
 test_state = [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    2,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    2,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    2,
-    1,
-    1,
-    1,
-    0,
-    0,
-    0,
+    0,0,0,0,0,0,0,
+    0,0,2,1,0,0,0,
+    0,0,1,2,1,0,0,
+    0,0,1,2,1,1,0,
+    0,1,1,2,2,2,0,
+    0,1,2,1,2,2,2,
 ]
-# final = alpha_beta_minimax(test_state, 2, False, -math.inf, math.inf)
+# fmt: on
+
+# final = alpha_beta_minimax(test_state, 4, True, -math.inf, math.inf)
 # print(final)
 # print_tree(RESULT)

@@ -183,8 +183,9 @@ while not game_over:
             else:
                 # posx = event.pos[0]
                 # col = int(math.floor(posx / SQUARESIZE))
-                modified_board = np.reshape(np.flip(board), -1).tolist()
-                # print(modified_board)
+                modified_board = np.reshape(np.fliplr(np.flip(board)), -1).tolist()
+                for i in range(6):
+                    print(modified_board[7 * i : 7 * i + 6])
                 final = alpha_beta_minimax(modified_board, 6, True, -math.inf, math.inf)
                 print(final)
                 col = final[1]
