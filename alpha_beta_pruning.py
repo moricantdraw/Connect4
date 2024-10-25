@@ -8,13 +8,16 @@ EMPTY_VALUE = 0
 # TREE = [10, math.inf, 5, 5, -10, -10, -10, -10, 7, 5, -math.inf, -math.inf, -7, -5, -7, -5]
 TREE = [5, 6, 4, 69, 3, 70, 71, 72, 6, 42, 6, 420, 7, 101, 102, 103]
 RESULT = dict()
+progress = 0
 
 
 def alpha_beta_minimax(current_state, depth, maximizing_player, alpha, beta):
+    global progress
     if depth == 0:  # or EMPTY_VALUE not in current_state:
         value = state_value(current_state)
         ret_val = (value, 0)
         # print(f"{depth},{ret_val}")
+        progress += 1
         RESULT[depth] = RESULT.get(depth, []) + [ret_val]
         return ret_val
     if maximizing_player:
@@ -51,6 +54,16 @@ def alpha_beta_minimax(current_state, depth, maximizing_player, alpha, beta):
         # print(f"{depth},{ret_val}")
         RESULT[depth] = RESULT.get(depth, []) + [ret_val]
         return ret_val
+
+
+def get_progress():
+    global progress
+    return progress
+
+
+def reset_progress():
+    global progress
+    progress = 0
 
 
 def state_value(state):

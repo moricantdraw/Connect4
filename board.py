@@ -2,11 +2,14 @@ import numpy as np
 import pygame
 import sys
 import math
-from alpha_beta_pruning import alpha_beta_minimax
+import threading
+import time
+from alpha_beta_pruning import alpha_beta_minimax, get_progress, reset_progress
 
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 
 ROW_COUNT = 6
@@ -108,7 +111,7 @@ def draw_board(board):
                     RED,
                     (
                         int(c * SQUARESIZE + SQUARESIZE / 2),
-                        height - int(r * SQUARESIZE + SQUARESIZE / 2),
+                        height - 20 - int(r * SQUARESIZE + SQUARESIZE / 2),
                     ),
                     RADIUS,
                 )
@@ -118,11 +121,28 @@ def draw_board(board):
                     YELLOW,
                     (
                         int(c * SQUARESIZE + SQUARESIZE / 2),
-                        height - int(r * SQUARESIZE + SQUARESIZE / 2),
+                        height - 20 - int(r * SQUARESIZE + SQUARESIZE / 2),
                     ),
                     RADIUS,
                 )
-    pygame.display.update()
+    # pygame.display.update()
+
+
+def progress_bar():
+    while not game_over:
+        draw_board(board)
+        pygame.draw.rect(
+            screen,
+            (0, 0, 0),
+            pygame.Rect(0, height - 10, width, 10),
+        )
+        pygame.draw.rect(
+            screen,
+            (255, 255, 255),
+            pygame.Rect(0, height - 10, int(width * get_progress() / DIVISOR), 10),
+        )
+        pygame.display.update()
+        time.sleep(0.03)
 
 
 board = create_board()
@@ -136,22 +156,27 @@ SQUARESIZE = 100
 
 # define width and height of board
 width = COLUMN_COUNT * SQUARESIZE
-height = (ROW_COUNT + 1) * SQUARESIZE
+height = (ROW_COUNT + 1) * SQUARESIZE + 20
 
 size = (width, height)
 
 RADIUS = int(SQUARESIZE / 2 - 5)
 
 screen = pygame.display.set_mode(size)
-draw_board(board)
-pygame.display.update()
+# draw_board(board)
+# pygame.display.update()
 
 myfont = pygame.font.SysFont("monospace", 75)
 
-while not game_over:
+depth = 6
+DIVISOR = depth**7
+t1 = threading.Thread(target=progress_bar)
+t1.start()
 
+while not game_over:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            game_over = True
             sys.exit()
 
         if event.type == pygame.MOUSEMOTION:
@@ -161,7 +186,7 @@ while not game_over:
                 pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
             else:
                 pygame.draw.circle(screen, YELLOW, (posx, int(SQUARESIZE / 2)), RADIUS)
-        pygame.display.update()
+        # pygame.display.update()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
@@ -179,34 +204,43 @@ while not game_over:
                         screen.blit(label, (40, 10))
                         game_over = True
 
+            # print_board(board)
+            # draw_board(board)
+            turn += 1
+            turn = turn % 2
+
             # Ask for Player 2 Input
-            else:
-                # posx = event.pos[0]
-                # col = int(math.floor(posx / SQUARESIZE))
-                modified_board = np.reshape(np.fliplr(np.flip(board)), -1).tolist()
-                for i in range(6):
-                    print(modified_board[7 * i : 7 * i + 6])
-                final = alpha_beta_minimax(modified_board, 6, True, -math.inf, math.inf)
-                print(final)
-                col = final[1]
-                if col is None:
-                    print("I give up.")
-                    sys.exit()
+            # else:
+            #     # posx = event.pos[0]
+            #     # col = int(math.floor(posx / SQUARESIZE))
+            reset_progress()
+            modified_board = np.reshape(np.fliplr(np.flip(board)), -1).tolist()
+            for i in range(6):
+                print(modified_board[7 * i : 7 * i + 6])
+            final = alpha_beta_minimax(modified_board, depth, True, -math.inf, math.inf)
+            print(final)
+            col = final[1]
+            if col is None:
+                label = myfont.render("Player 1 resigned!!", 1, GREEN)
+                screen.blit(label, (40, 10))
+                game_over = True
 
-                if is_valid_location(board, col):
-                    row = get_next_open_row(board, col)
-                    drop_piece(board, row, col, 2)
+            if is_valid_location(board, col):
+                row = get_next_open_row(board, col)
+                drop_piece(board, row, col, 2)
 
-                    if winning_move(board, 2):
-                        label = myfont.render("Player 2 wins!!", 1, YELLOW)
-                        screen.blit(label, (40, 10))
-                        game_over = True
+                if winning_move(board, 2):
+                    label = myfont.render("Player 2 wins!!", 1, YELLOW)
+                    screen.blit(label, (40, 10))
+                    game_over = True
 
             # print_board(board)
-            draw_board(board)
+            # draw_board(board)
 
             turn += 1
             turn = turn % 2
+
+            pygame.event.clear()
 
             if game_over:
                 pygame.time.wait(3000)
