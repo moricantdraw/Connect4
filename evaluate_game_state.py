@@ -62,6 +62,8 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         #     return weights[token_count]
         if token_count + start + jump < 4:  # if not enough space
             return 0
+        if 4 < token_count + jump - end < 7 and jump > 1:  # disincentivize 5,6
+            return 0
         if jump - end > 0:  # if there was a break, derate
             token_count -= 0.5 * (jump - end)
         if token_count:
