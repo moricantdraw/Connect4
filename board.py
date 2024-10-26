@@ -11,6 +11,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
+WHITE = (255, 255, 255)
 
 ROW_COUNT = 6
 COLUMN_COUNT = 7
@@ -145,6 +146,80 @@ def progress_bar():
         time.sleep(0.03)
 
 
+def human_player(first):
+    global game_over
+    if not game_over:
+        posx = event.pos[0]
+        col = int(math.floor(posx / SQUARESIZE))
+
+        if is_valid_location(board, col):
+            row = get_next_open_row(board, col)
+            drop_piece(board, row, col, 2 - first)
+
+            if winning_move(board, 2 - first):
+                label = myfont.render(f"Player {2-first} wins!!", 1, WHITE)
+                screen.blit(label, (40, 10))
+                game_over = True
+        draw_board(board)
+
+
+def reverse_board(inp):
+    out = inp
+    out = [3 if i == 2 else i for i in out]  # turn 2 to 3
+    out = [2 if i == 1 else i for i in out]  # turn 1 to 2
+    out = [1 if i == 3 else i for i in out]  # turn 3 to 1
+    # print(out)
+    return out
+
+
+def computer_player(first):
+    global game_over
+    if not game_over:
+        reset_progress()
+        modified_board = np.reshape(np.fliplr(np.flip(board)), -1).tolist()
+        if first:
+            modified_board = reverse_board(modified_board)
+        for i in range(6):
+            print(modified_board[7 * i : 7 * i + 7])
+        d = None
+        # Computer wins
+        computer_wins = alpha_beta_minimax(modified_board, 1, True, -math.inf, math.inf)
+        # Computer must block
+        computer_block = alpha_beta_minimax(
+            modified_board, 1, False, -math.inf, math.inf
+        )
+        if math.isinf(computer_wins[0]):
+            final = computer_wins
+        elif math.isinf(computer_block[0]):
+            final = computer_block
+        else:
+            d = min(depth, modified_board.count(0))
+            chosen_move = (None, None)
+            while chosen_move[1] is None and d > 0:
+                chosen_move = alpha_beta_minimax(
+                    modified_board, d, True, -math.inf, math.inf
+                )
+                print(d)
+                d -= 2
+            final = chosen_move
+        print(f"{final}")
+        col = final[1]
+        if col is None:
+            label = myfont.render("Resigned!!", 1, WHITE)
+            screen.blit(label, (40, 10))
+            game_over = True
+        else:
+            if is_valid_location(board, col):
+                row = get_next_open_row(board, col)
+                drop_piece(board, row, col, 2 - first)
+
+                if winning_move(board, 2 - first):
+                    label = myfont.render(f"Player {2-first} wins!!", 1, WHITE)
+                    screen.blit(label, (40, 10))
+                    game_over = True
+        draw_board(board)
+
+
 board = create_board()
 print_board(board)
 game_over = False
@@ -173,6 +248,9 @@ DIVISOR = depth**7
 t1 = threading.Thread(target=progress_bar)
 t1.start()
 
+computer_first = True
+computer_turn = computer_first
+
 while not game_over:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -182,88 +260,26 @@ while not game_over:
         if event.type == pygame.MOUSEMOTION:
             pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
             posx = event.pos[0]
-            if turn == 0:
+            if not computer_first:
                 pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE / 2)), RADIUS)
             else:
                 pygame.draw.circle(screen, YELLOW, (posx, int(SQUARESIZE / 2)), RADIUS)
         # pygame.display.update()
 
+        if computer_turn:
+            computer_player(computer_first)
+            computer_turn = False
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
-            # Ask for Player 1 Input
-            if turn == 0:
-                posx = event.pos[0]
-                col = int(math.floor(posx / SQUARESIZE))
 
-                if is_valid_location(board, col):
-                    row = get_next_open_row(board, col)
-                    drop_piece(board, row, col, 1)
-
-                    if winning_move(board, 1):
-                        label = myfont.render("Player 1 wins!!", 1, RED)
-                        screen.blit(label, (40, 10))
-                        game_over = True
-
-            # print_board(board)
-            draw_board(board)
-            turn += 1
-            turn = turn % 2
-
-            # Ask for Player 2 Input
-            # else:
-            #     # posx = event.pos[0]
-            #     # col = int(math.floor(posx / SQUARESIZE))
-            if not game_over:
-                reset_progress()
-                modified_board = np.reshape(np.fliplr(np.flip(board)), -1).tolist()
-                for i in range(6):
-                    print(modified_board[7 * i : 7 * i + 7])
-                d = None
-                # Computer wins
-                computer_wins = alpha_beta_minimax(
-                    modified_board, 1, True, -math.inf, math.inf
-                )
-                # Computer must block
-                computer_block = alpha_beta_minimax(
-                    modified_board, 1, False, -math.inf, math.inf
-                )
-                if math.isinf(computer_wins[0]):
-                    final = computer_wins
-                elif math.isinf(computer_block[0]):
-                    final = computer_block
-                else:
-                    d = min(depth, modified_board.count(0))
-                    chosen_move = (None, None)
-                    while chosen_move[1] is None and d > 0:
-                        chosen_move = alpha_beta_minimax(
-                            modified_board, d, True, -math.inf, math.inf
-                        )
-                        print(d)
-                        d -= 2
-                    final = chosen_move
-                print(f"{final}")
-                col = final[1]
-                if col is None:
-                    label = myfont.render("Resigned!!", 1, GREEN)
-                    screen.blit(label, (40, 10))
-                    game_over = True
-                else:
-                    if is_valid_location(board, col):
-                        row = get_next_open_row(board, col)
-                        drop_piece(board, row, col, 2)
-
-                        if winning_move(board, 2):
-                            label = myfont.render("Player 2 wins!!", 1, YELLOW)
-                            screen.blit(label, (40, 10))
-                            game_over = True
-
-                # print_board(board)
-                draw_board(board)
-
-            turn += 1
-            turn = turn % 2
+            human_player(not computer_first)
+            computer_turn = True
 
             pygame.event.clear()
-
-            if game_over:
-                pygame.time.wait(10000)
+    if 0 not in board:
+        label = myfont.render("Tie!!", 1, WHITE)
+        game_over = True
+        draw_board(board)
+    if game_over:
+        pygame.time.wait(10000)
