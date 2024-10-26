@@ -4,6 +4,7 @@ import sys
 import math
 import threading
 import time
+import copy
 from alpha_beta_pruning import alpha_beta_minimax, get_progress, reset_progress
 
 BLUE = (0, 0, 255)
@@ -176,7 +177,9 @@ def computer_player(first):
     global game_over
     if not game_over:
         reset_progress()
-        modified_board = np.reshape(np.fliplr(np.flip(board)), -1).tolist()
+        modified_board = np.reshape(
+            np.fliplr(np.flip(copy.deepcopy(board))), -1
+        ).tolist()
         if first:
             modified_board = reverse_board(modified_board)
         for i in range(6):
@@ -220,6 +223,12 @@ def computer_player(first):
         draw_board(board)
 
 
+def set_depth(new_depth):
+    global depth, DIVISOR
+    depth = new_depth
+    DIVISOR = depth ** (7 - 1.5)
+
+
 board = create_board()
 print_board(board)
 game_over = False
@@ -243,8 +252,7 @@ screen = pygame.display.set_mode(size)
 
 myfont = pygame.font.SysFont("monospace", 75)
 
-depth = 6
-DIVISOR = depth**7
+set_depth(6)
 t1 = threading.Thread(target=progress_bar)
 t1.start()
 
@@ -277,9 +285,16 @@ while not game_over:
             human_player(not computer_first)
             computer_turn = True
 
+    s = 0
+    for c in range(7):
+        s += is_valid_location(board, c)
+    set_depth(int(10 - s / 2))
+
     if 0 not in board:
+        draw_board(board)
         label = myfont.render("Tie!!", 1, WHITE)
         game_over = True
-        draw_board(board)
+        pygame.display.update()
+
     if game_over:
         pygame.time.wait(10000)

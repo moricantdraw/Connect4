@@ -23,6 +23,7 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
     def count_sequence(start, delta_row, delta_col, p, weight=2):
         # Counts the length of sequences of the player's tokens starting from (start) in the given direction.
         row, col = divmod(start, cols)
+        start_row = row
         token_count = 0
 
         # Traverse the sequence in the specified direction
@@ -61,7 +62,7 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         if jump - end > 0:  # if there was a break, derate
             token_count -= 0.5 * (jump - end)
         if token_count:
-            return weight**token_count
+            return (1 - start_row * 0.16) + weight**token_count
         return 0
 
     # Traverse the entire game to evaluate
