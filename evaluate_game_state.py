@@ -170,8 +170,19 @@ def print_game_1d(game_state, rows=6, cols=7):
 #     0,  # Row 5 (bottom)
 # ]
 
+# fmt: off
+test_state = [
+    0,0,0,2,0,0,0,
+    0,0,0,1,0,0,0,
+    0,0,0,2,0,0,0,
+    0,1,0,1,0,0,0,
+    2,2,0,2,0,0,0,
+    1,1,0,2,2,0,1,
+]
+# fmt: on
+
 # Evaluate for Player 2 and normalize
-# normalized_score = evaluate_game_state(game_state)
+# normalized_score = evaluate_game_state(test_state)
 # print(f"Normalized board score for Player 2: {normalized_score}")
 
 # Print  game
