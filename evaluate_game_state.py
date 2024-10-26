@@ -62,7 +62,7 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         if jump - end > 0:  # if there was a break, derate
             token_count -= 0.5 * (jump - end)
         if token_count:
-            return (1 - start_row * 0.16) + weight**token_count
+            return (0.5 - start_row * 0.08) + weight**token_count
         return 0
 
     # Traverse the entire game to evaluate
