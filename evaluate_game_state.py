@@ -42,9 +42,9 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
                 if jump == 0 and token_count >= 4:  # if a win is detected
                     return math.inf
             elif board[index] == 0:
-                if detected:
-                    jump += 1
-                    end += 1  # does not end on a token
+                # if detected:
+                jump += 1
+                end += 1  # does not end on a token
             else:
                 break  # Stop if different token or empty spot
 
