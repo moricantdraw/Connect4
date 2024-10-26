@@ -269,6 +269,7 @@ while not game_over:
         if computer_turn:
             computer_player(computer_first)
             computer_turn = False
+            pygame.event.clear()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
@@ -276,7 +277,6 @@ while not game_over:
             human_player(not computer_first)
             computer_turn = True
 
-            pygame.event.clear()
     if 0 not in board:
         label = myfont.render("Tie!!", 1, WHITE)
         game_over = True
