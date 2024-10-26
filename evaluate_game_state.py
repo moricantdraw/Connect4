@@ -30,6 +30,7 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         detected = False
         jump = 0
         end = 0
+        start = 0
         while 0 <= row < rows and 0 <= col < cols:
             index = row * cols + col
             if board[index] == p:
@@ -42,9 +43,11 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
                 if jump == 0 and token_count >= 4:  # if a win is detected
                     return math.inf
             elif board[index] == 0:
-                # if detected:
-                jump += 1
-                end += 1  # does not end on a token
+                if detected:
+                    jump += 1
+                    end += 1  # does not end on a token
+                else:
+                    start += 1
             else:
                 break  # Stop if different token or empty spot
 
@@ -57,7 +60,7 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         # token_count = min(max(1, token_count), 4)
         # if token_count in weights:
         #     return weights[token_count]
-        if token_count + jump < 4:  # if not enough space
+        if token_count + start + jump < 4:  # if not enough space
             return 0
         if jump - end > 0:  # if there was a break, derate
             token_count -= 0.5 * (jump - end)
