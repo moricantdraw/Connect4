@@ -148,12 +148,13 @@ def progress_bar():
 
 
 def human_player(first):
-    global game_over
+    global game_over, computer_turn
     if not game_over:
         posx = event.pos[0]
         col = int(math.floor(posx / SQUARESIZE))
 
         if is_valid_location(board, col):
+            computer_turn = True
             row = get_next_open_row(board, col)
             drop_piece(board, row, col, 2 - first)
 
@@ -174,7 +175,7 @@ def reverse_board(inp):
 
 
 def computer_player(first):
-    global game_over
+    global game_over, computer_turn
     if not game_over:
         reset_progress()
         modified_board = np.reshape(
@@ -213,6 +214,7 @@ def computer_player(first):
             game_over = True
         else:
             if is_valid_location(board, col):
+                computer_turn = False
                 row = get_next_open_row(board, col)
                 drop_piece(board, row, col, 2 - first)
 
@@ -276,14 +278,11 @@ while not game_over:
 
         if computer_turn:
             computer_player(computer_first)
-            computer_turn = False
             pygame.event.clear()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             pygame.draw.rect(screen, BLACK, (0, 0, width, SQUARESIZE))
-
             human_player(not computer_first)
-            computer_turn = True
 
     s = 0
     for c in range(7):
@@ -293,6 +292,7 @@ while not game_over:
     if 0 not in board:
         draw_board(board)
         label = myfont.render("Tie!!", 1, WHITE)
+        screen.blit(label, (40, 10))
         game_over = True
         pygame.display.update()
 
