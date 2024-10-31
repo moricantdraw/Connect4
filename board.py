@@ -210,6 +210,7 @@ def computer_player(first):
             print(modified_board[7 * i : 7 * i + 7])
         d = None
 
+
         # Calculate algorithm move with alpha-beta pruning
 
         # Calculate winning move for computer

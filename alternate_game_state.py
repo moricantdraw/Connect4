@@ -24,7 +24,7 @@ def alternative_gamestate(game_state, column, player, rows=6, cols=7):
             new_game_state[index] = player  # Place the player's token
             return new_game_state  # Return the updated game_state
 
-    return None  # Indicate mo move could be made
+    return None  # Indicate no move could be made
 
 # Code used for testing of implementation (see bottom of file)
 def print_game_1d(game_state, rows=6, cols=7):  
