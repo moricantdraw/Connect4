@@ -1,17 +1,17 @@
-import copy
+import copy # Import copy module for calculations
 
-
+# Function to simulate alternate game state after move is made
 def alternative_gamestate(game_state, column, player, rows=6, cols=7):
     """
     Parameters:
-    game_state: what the game looks like
-    column: Column (0-indexed) in which to make the move.
-    player: Player making the move
-    rows: Number of rows in the Connect 4 board
-    cols: Number of columns in the Connect 4 board
+        game_state: what the game looks like
+        column: Column (0-indexed) in which to make the move.
+        player: Int representing player making the move
+        rows: Int representing of rows in the Connect 4 board
+        cols: Int representing of columns in the Connect 4 board
 
     Returns:
-    new_game_state
+        new_game_state
     """
     new_game_state = copy.deepcopy(
         game_state
@@ -24,19 +24,17 @@ def alternative_gamestate(game_state, column, player, rows=6, cols=7):
             new_game_state[index] = player  # Place the player's token
             return new_game_state  # Return the updated game_state
 
-    # If the column is full...
-    # print(f"Column {column} is full!")
-    return None  # game_state  # No move made !
+    return None  # Indicate mo move could be made
 
-
-def print_game_1d(
-    game_state, rows=6, cols=7
-):  # this was for me to see it... you don't have to keep this
+# Code used for testing of implementation (see bottom of file)
+def print_game_1d(game_state, rows=6, cols=7):  
+    "Helper function to print the 1D board as a 2D grid."
     for row in range(rows):
         print(game_state[row * cols : (row + 1) * cols])
 
 
-# TESTING STUFF
+# TESTING
+
 # game_state = [
 #     0,
 #     1,

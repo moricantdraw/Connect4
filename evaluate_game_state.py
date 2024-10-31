@@ -1,22 +1,29 @@
 import math
 
-
+# Function to evaluate the board state based on token placement
 def evaluate_game_state(board, rows=6, cols=7, player=2):
     """
     Scores move based on how many player tokens are adjacent to each other.
 
-    Returns:
-    float: The normalized score of the move (between 0 and 1).
-    """
-    score = 0
+    Parameters:
+        board: List representing current state
+        rows: Int representing of rows in the Connect 4 board
+        cols: Int representing of columns in the Connect 4 board
+        player: Int representing player making the move       
 
+    Returns:
+        float: The normalized score of the move (between 0 and 1).
+    """
+    score = 0 # Initialize score
+
+    # Establish who the opponent is based on the player
     opponent = 1
     if player == 2:
         opponent = 1
     elif player == 1:
         opponent = 2
 
-    # Defines  scoring weights for sequences of length 2, 3, and 4 (normalized to 1)
+    # Defines scoring weights for sequences of length 2, 3, and 4 (normalized to 1)
     weights = {1: 0.0, 2: 1, 3: 5, 4: math.inf}
 
     # Helper function to check sequences
@@ -27,58 +34,55 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
         token_count = 0
 
         # Traverse the sequence in the specified direction
-        detected = False
-        jump = 0
-        end = 0
+        detected = False # Check if sequence has started
+        jump = 0 # Num of empty spaces
+        end = 0 # Track how many times it gets to the end of a sequence
         start = 0
+
+
         while 0 <= row < rows and 0 <= col < cols:
             index = row * cols + col
-            if board[index] == p:
+            if board[index] == p: # If slot has token
                 token_count += 1
                 detected = True
-                # if blank:
-                #     # token_count -= 1
-                #     blank = False
                 end = 0  # end on a token
                 if jump == 0 and token_count >= 4:  # if a win is detected
                     return math.inf
-            elif board[index] == 0:
+            elif board[index] == 0: # If slot is empty
                 if detected:
-                    jump += 1
+                    jump += 1 # track empty spaces
                     end += 1  # does not end on a token
                 else:
                     start += 1
             else:
                 break  # Stop if different token or empty spot
 
+            # Move to next row and column
             row += delta_row
             col += delta_col
 
-        # if jump - end > 0:
-        #     token_count = min(token_count, 3)
-        # # Add to score based on length of sequence
-        # token_count = min(max(1, token_count), 4)
-        # if token_count in weights:
-        #     return weights[token_count]
-        if token_count + start + jump < 4:  # if not enough space
+        if token_count + start + jump < 4:  # if not enough space to make a connect 4
             return 0
-        if 4 < token_count + jump - end < 7 and jump > 1:  # disincentivize 5,6
+        if 4 < token_count + jump - end < 7 and jump > 1:  # disincentivize 5,6 (longer sequences)
             return 0
         if jump - end > 0:  # if there was a break, derate
             token_count -= 0.5 * (jump - end)
         if token_count:
             return weight**token_count  # + (0.5 - start_row * 0.08)
-        return 0
+        return 0 # return 0 if no sequence is valid
 
     # Traverse the entire game to evaluate
     opponent_score = 0
     player_score = 0
     opponent_weight = 2
     player_weight = 2
+
+    # Iterate through the board to check sequences for player and opponent
     for row in range(rows):
         for col in range(cols):
             index = row * cols + col
             if board[index] == opponent:
+                # Check all directions for opponent sequence
                 opponent_score -= count_sequence(
                     index, 0, 1, opponent, opponent_weight
                 )  # Horizontal
@@ -106,24 +110,21 @@ def evaluate_game_state(board, rows=6, cols=7, player=2):
                     index, -1, 1, player, player_weight
                 )  # Diagonal-up-right
 
-    # max_possible_score = 4 * rows * cols
-
-    # Normalize the score between 0 and 1
-    # normalized_score = min(score / max_possible_score, 1.0)
+    # Return score
     if math.isinf(opponent_score):
-        # if math.isinf(player_score):
-        #     return 0
         return opponent_score
     score = player_score + opponent_score
     return score  # normalized_score
 
 
-# MORE TESTING STUFF--- YOU CAN IGNORE THIS
+# Code used for testing of implementation (see bottom of file)
 def print_game_1d(game_state, rows=6, cols=7):
-    """Helper function to print the 1D board as a 2D grid."""
+    "Helper function to print the 1D board as a 2D grid."
     for row in range(rows):
         print(game_state[row * cols : (row + 1) * cols])
 
+
+# TESTING
 
 # game_state = [
 #     0,
